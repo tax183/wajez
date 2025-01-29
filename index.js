@@ -3,6 +3,7 @@ const multer = require('multer');
 const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
 const path = require('path');
 const fs = require('fs');
+const { spawn } = require('child_process');
 require('dotenv').config();
 
 const app = express();
@@ -93,14 +94,22 @@ app.delete('/delete/:filename', (req, res) => {
 
     if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        res.sendStatus(200); // لا نعيد رسالة في JSON
+        res.sendStatus(200);
     } else {
-        res.sendStatus(404); // ملف غير موجود
+        res.sendStatus(404);
     }
+});
+
+// تشغيل `worker.js` داخل نفس السيرفر
+const workerProcess = spawn('node', ['worker.js'], {
+    stdio: 'inherit'
+});
+
+workerProcess.on('exit', (code) => {
+    console.log(`Worker exited with code ${code}`);
 });
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-
