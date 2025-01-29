@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config(); // تحميل متغيرات البيئة
+require('dotenv').config();
 
 // تحقق من متغيرات البيئة
 if (!process.env.AWS_REGION || !process.env.AWS_ACCESS_KEY || !process.env.AWS_SECRET_KEY || !process.env.SQS_QUEUE_URL) {
@@ -22,8 +22,12 @@ AWS.config.update({
 const sqs = new AWS.SQS();
 const queueUrl = process.env.SQS_QUEUE_URL;
 
+// تأكد من وجود مجلد results
 const resultsDir = path.join(__dirname, 'results');
-if (!fs.existsSync(resultsDir)) fs.mkdirSync(resultsDir);
+if (!fs.existsSync(resultsDir)) {
+    fs.mkdirSync(resultsDir, { recursive: true });
+    console.log("Created results directory.");
+}
 
 // قائمة لتجنب التكرار
 const processedMessages = new Set();
@@ -54,7 +58,13 @@ const processMessages = async () => {
             console.log(`Processing file: ${originalName}`);
             processedMessages.add(message.MessageId);
 
-            exec(`python analyze.py "${filePath}"`, (error, stdout, stderr) => {
+            // تأكد أن الملف موجود
+            if (!fs.existsSync(filePath)) {
+                console.error(`Error: File not found: ${filePath}`);
+                continue;
+            }
+
+            exec(`python3 analyze.py "${filePath}"`, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Error processing file ${originalName}:`, error.message);
                     return;
@@ -81,4 +91,6 @@ const processMessages = async () => {
     }
 };
 
+// تشغيل المعالجة كل 5 ثواني
 setInterval(processMessages, 5000);
+

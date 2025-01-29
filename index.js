@@ -9,29 +9,33 @@ require('dotenv').config();
 const app = express();
 const PORT = 3000;
 
+// إنشاء المجلدات إذا لم تكن موجودة
+const ensureDirectoryExists = (dir) => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log(`Created directory: ${dir}`);
+    }
+};
+
+const resultsDir = path.join(__dirname, 'results');
+const uploadsDir = path.join(__dirname, 'uploads');
+ensureDirectoryExists(resultsDir);
+ensureDirectoryExists(uploadsDir);
+
 // تقديم الملفات الثابتة (Front-End)
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir));
 
-// إعداد التخزين للملفات باستخدام Multer
+// إعداد Multer لرفع الملفات
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, 'uploads');
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath);
-        }
-        cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname);
-    },
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => cb(null, file.originalname),
 });
 
 const upload = multer({
     storage,
     fileFilter: (req, file, cb) => {
-        const allowedTypes = ['application/pdf'];
-        if (allowedTypes.includes(file.mimetype)) {
+        if (file.mimetype === 'application/pdf') {
             cb(null, true);
         } else {
             cb(new Error('Unsupported file type. Only PDF is allowed.'));
@@ -47,14 +51,7 @@ const sqsClient = new SQSClient({
         secretAccessKey: process.env.AWS_SECRET_KEY,
     },
 });
-
 const queueUrl = process.env.SQS_QUEUE_URL;
-const resultsDir = path.join(__dirname, 'results');
-const uploadsDir = path.join(__dirname, 'uploads');
-
-// تأكد من وجود المجلدات
-if (!fs.existsSync(resultsDir)) fs.mkdirSync(resultsDir);
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
 // إرسال رسالة إلى SQS
 const sendMessage = async (filePath, originalName) => {
@@ -77,8 +74,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         return res.status(400).json({ message: 'No file uploaded!' });
     }
 
-    console.log('Uploaded file:', req.file.filename);
-
+    console.log(`Uploaded file: ${req.file.filename}`);
     await sendMessage(req.file.path, req.file.filename);
 
     res.status(201).json({
@@ -100,10 +96,8 @@ app.delete('/delete/:filename', (req, res) => {
     }
 });
 
-// تشغيل `worker.js` داخل نفس السيرفر
-const workerProcess = spawn('node', ['worker.js'], {
-    stdio: 'inherit'
-});
+// تشغيل `worker.js` داخل السيرفر
+const workerProcess = spawn('node', ['worker.js'], { stdio: 'inherit' });
 
 workerProcess.on('exit', (code) => {
     console.log(`Worker exited with code ${code}`);
@@ -113,3 +107,4 @@ workerProcess.on('exit', (code) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
