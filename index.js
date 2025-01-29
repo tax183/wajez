@@ -1,0 +1,106 @@
+const express = require('express');
+const multer = require('multer');
+const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
+const path = require('path');
+const fs = require('fs');
+require('dotenv').config();
+
+const app = express();
+const PORT = 3000;
+
+// تقديم الملفات الثابتة (Front-End)
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// إعداد التخزين للملفات باستخدام Multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadPath = path.join(__dirname, 'uploads');
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath);
+        }
+        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    },
+});
+
+const upload = multer({
+    storage,
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['application/pdf'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Unsupported file type. Only PDF is allowed.'));
+        }
+    },
+});
+
+// إعداد AWS SQS
+const sqsClient = new SQSClient({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_KEY,
+    },
+});
+
+const queueUrl = process.env.SQS_QUEUE_URL;
+const resultsDir = path.join(__dirname, 'results');
+const uploadsDir = path.join(__dirname, 'uploads');
+
+// تأكد من وجود المجلدات
+if (!fs.existsSync(resultsDir)) fs.mkdirSync(resultsDir);
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+
+// إرسال رسالة إلى SQS
+const sendMessage = async (filePath, originalName) => {
+    const params = {
+        QueueUrl: queueUrl,
+        MessageBody: JSON.stringify({ filePath, originalName }),
+    };
+
+    try {
+        await sqsClient.send(new SendMessageCommand(params));
+        console.log(`Message sent to SQS for file: ${originalName}`);
+    } catch (error) {
+        console.error(`Error sending message for file: ${originalName}`, error);
+    }
+};
+
+// نقطة نهاية لرفع الملفات
+app.post('/upload', upload.single('file'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded!' });
+    }
+
+    console.log('Uploaded file:', req.file.filename);
+
+    await sendMessage(req.file.path, req.file.filename);
+
+    res.status(201).json({
+        message: 'File uploaded successfully!',
+        fileName: req.file.filename,
+    });
+});
+
+// نقطة نهاية لحذف الملفات
+app.delete('/delete/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(uploadsDir, filename);
+
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        res.sendStatus(200); // لا نعيد رسالة في JSON
+    } else {
+        res.sendStatus(404); // ملف غير موجود
+    }
+});
+
+// تشغيل السيرفر
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
+

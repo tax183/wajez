@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TextSnap</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo-container">
+      <h1 class="logo">TextSnap</h1>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <h2>Extract the texts from the files and summarize</h2>
+      <p>Textsnap saves you time and effort by easily extracting text from files and summarizing it.</p>
+    </section>
+
+    <div class="upload">
+      <h3>Select the file you want to summarize</h3>
+      <div class="upload-box" id="uploadBox">
+        <p>Select or drop a file</p>
+        <p class="file-types">We support (pdf)</p>
+        <input type="file" id="fileInput" class="file-input" />
+      </div>
+
+      <div id="fileInfo" class="file-uploaded hidden">
+        <div id="fileName" class="text-wrapper"></div>
+        <img id="deleteFileBtn" class="delete" src="img/delete_icon.png" alt="Delete Icon">
+      </div>
+
+      <button class="summarize-btn" id="summarizeBtn" disabled>Summarize</button>
+    </div>
+  </main>
+
+  <script src="day.js"></script>
+</body>
+</html>
+

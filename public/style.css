@@ -1,0 +1,269 @@
+/* ======= Reset Styles ======= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ======= General Styles ======= */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+  height: 100vh;
+  margin: 0;
+
+  /* خلفية عامة */
+  background-image: url('img/Group.png'); /* مسار الخلفية */
+  background-size: cover; /* جعل الصورة تغطي الشاشة */
+  background-position: center; /* تمركز الصورة */
+  background-repeat: no-repeat; /* منع تكرار الصورة */
+}
+
+/* ======= Header ======= */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* لإضافة عناصر مثل الزر في اليمين */
+  padding: 20px 30px;
+  background-color: #1e1e1e;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-image {
+  width: 32px;
+  height: 32px;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.new-file-btn {
+  background-color: #6a5acd;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.new-file-btn:hover {
+  background-color: #8a79e8;
+}
+
+/* ======= Index Page Styles ======= */
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding-top: 120px;
+  text-align: center;
+}
+
+.intro h2 {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+}
+
+.intro p {
+  font-size: 1rem;
+  color: #cccccc;
+  margin-bottom: 50px;
+}
+
+.upload h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+}
+
+.upload-box {
+  border: 2px dashed #6a5acd;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  height: 150px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-box p {
+  margin: 5px 0;
+}
+
+.file-types {
+  font-size: 0.9rem;
+  color: #aaaaaa;
+}
+
+.summarize-btn {
+  background-color: #6a5acd;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 150px;
+}
+.summarize-btn:disabled {
+  background-color: #333;
+  cursor: not-allowed;
+}
+
+.summarize-btn:hover {
+  background-color: #8a79e8;
+}
+
+/* ======= Results Page Styles ======= */
+.content {
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr; /* ثلاث أعمدة */
+  gap: 20px;
+  padding: 20px;
+  height: 100%;
+}
+
+.file-list {
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.file-name {
+  color: #ffffff;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #ff5c5c;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.pdf-preview,
+.result {
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #cccccc;
+}
+
+.pdf-preview h2,
+.result h2 {
+  font-size: 1.5rem;
+}
+.file-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #6a5acd;
+  border-radius: 5px;
+  background-color: #1e1e1e;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: flex;
+}
+
+
+.file-name {
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.file-info {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #ff5c5c;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  color: #ff3333;
+}
+/* ======= صندوق الملف ======= */
+.file-uploaded {
+  position: relative;
+  width: 565px;
+  height: 52px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 0.5px solid #eaeaeae6;
+  margin: 10px auto;
+  display: flex;
+  align-items: center;
+  background-color: #1e1e1e;
+  display: none; /* إخفاء الصندوق افتراضيًا */
+}
+
+.file-uploaded.visible {
+  display: flex; /* إظهار الصندوق عند الحاجة */
+}
+
+.file-uploaded .bi-filetype-pdf {
+  width: 24px;
+  height: 24px;
+  margin-left: 16px;
+}
+
+.file-uploaded .text-wrapper {
+  flex: 1;
+  margin-left: 16px;
+  font-family: "Poppins-SemiBold", Helvetica, sans-serif;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.file-uploaded .delete {
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.file-uploaded .delete:hover {
+  filter: brightness(1.2);
+}
+.file-uploaded.hidden {
+  display: none;
+}
+

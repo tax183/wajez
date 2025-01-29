@@ -1,0 +1,106 @@
+/* Reset default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #1e1e1e;
+  border-bottom: 1px solid #333;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-image {
+  width: 32px;
+  height: 32px;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.new-file-btn {
+  background-color: #6a5acd;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.new-file-btn:hover {
+  background-color: #8a79e8;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr;
+  gap: 20px;
+  padding: 20px;
+  height: 100%;
+}
+
+.file-list {
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.file-name {
+  color: #ffffff;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #ff5c5c;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.pdf-preview,
+.result {
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #cccccc;
+}
+
+.pdf-preview h2,
+.result h2 {
+  font-size: 1.5rem;
+}
