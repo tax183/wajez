@@ -1,6 +1,5 @@
 const express = require('express');
 const multer = require('multer');
-const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -43,31 +42,6 @@ const upload = multer({
     },
 });
 
-// إعداد AWS SQS
-const sqsClient = new SQSClient({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY,
-        secretAccessKey: process.env.AWS_SECRET_KEY,
-    },
-});
-const queueUrl = process.env.SQS_QUEUE_URL;
-
-// إرسال رسالة إلى SQS
-const sendMessage = async (filePath, originalName) => {
-    const params = {
-        QueueUrl: queueUrl,
-        MessageBody: JSON.stringify({ filePath, originalName }),
-    };
-
-    try {
-        await sqsClient.send(new SendMessageCommand(params));
-        console.log(`Message sent to SQS for file: ${originalName}`);
-    } catch (error) {
-        console.error(`Error sending message for file: ${originalName}`, error);
-    }
-};
-
 // نقطة نهاية لرفع الملفات
 app.post('/upload', upload.single('file'), async (req, res) => {
     if (!req.file) {
@@ -75,7 +49,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     }
 
     console.log(`Uploaded file: ${req.file.filename}`);
-    await sendMessage(req.file.path, req.file.filename);
 
     res.status(201).json({
         message: 'File uploaded successfully!',
@@ -96,15 +69,10 @@ app.delete('/delete/:filename', (req, res) => {
     }
 });
 
-// تشغيل `worker.js` داخل السيرفر
-const workerProcess = spawn('node', ['worker.js'], { stdio: 'inherit' });
-
-workerProcess.on('exit', (code) => {
-    console.log(`Worker exited with code ${code}`);
-});
+// تشغيل `worker.js` داخل السيرفر (مؤقتًا معلق لأنه مرتبط بـ SQS)
+// const workerProcess = spawn('node', ['worker.js'], { stdio: 'inherit' });
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-
