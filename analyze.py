@@ -153,7 +153,7 @@ def analyze():
 
 if __name__ == '__main__':
     os.makedirs('temp', exist_ok=True)
-    
-    # 🔹 استخدم المنفذ 8080 بدلًا من 5000 لضمان التوافق مع Railway
-    port = int(os.environ.get('PORT', 8080))
-    app.run(debug=True, port=port)
+
+    # استخدام المنفذ الذي يحدده السيرفر تلقائيًا أو اختيار منفذ متاح
+    port = int(os.environ.get('PORT', 0))
+    app.run(debug=True, port=port, host='0.0.0.0')
