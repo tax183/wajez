@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://wajez-api.onrender.com"; // رابط الباك-إند على Render
+const API_BASE_URL = "wajez-production.up.railway.app"; // رابط الباك-إند على Render
 
 const fileInput = document.getElementById('fileInput');
 const uploadBox = document.getElementById('uploadBox');
