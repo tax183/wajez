@@ -1,4 +1,4 @@
-const API_BASE_URL = "wajez-production.up.railway.app"; // رابط الباك-إند على Render
+const API_BASE_URL = "https://wajez-production.up.railway.app"; // رابط الباك-إند على Render
 
 const pdfViewer = document.getElementById('pdfViewer');
 const resultText = document.getElementById('resultText');
