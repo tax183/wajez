@@ -19,19 +19,12 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 app = Flask(__name__)
-CORS(app, resources={
-    r"/analyze": {
-        "origins": ["http://localhost:5173"],
-        "methods": ["POST"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+CORS(app)
 
 # Supported file types
 SUPPORTED_FILE_TYPES = {'.pdf', '.png', '.jpg', '.jpeg', '.gif', '.webp'}
 
 def perform_ocr_on_image(image):
-    """Perform OCR on an image"""
     try:
         if image.mode != 'L':
             image = image.convert('L')
@@ -46,7 +39,6 @@ def perform_ocr_on_image(image):
         return None
 
 def process_with_llm(content):
-    """Process extracted text with LLM to create structured tables"""
     try:
         system_prompt = """
         You are an AI that organizes extracted text into structured tables.
@@ -71,7 +63,6 @@ def process_with_llm(content):
         return None
 
 def process_pdf(pdf_path):
-    """Process PDF file, extracting text and images"""
     try:
         doc = fitz.open(pdf_path)
         all_text = []
@@ -103,7 +94,6 @@ def process_pdf(pdf_path):
         return f"Error processing PDF: {str(e)}"
 
 def analyze_file(file_path):
-    """Analyze file content"""
     try:
         file_ext = os.path.splitext(file_path.lower())[1]
         if file_ext == '.pdf':
@@ -153,7 +143,7 @@ def analyze():
 
 if __name__ == '__main__':
     os.makedirs('temp', exist_ok=True)
-
-    # استخدام المنفذ الذي يحدده السيرفر تلقائيًا أو اختيار منفذ متاح
-    port = int(os.environ.get('PORT', 0))
+    
+    # تحديد منفذ مرن لتجنب تعارض المنافذ
+    port = int(os.environ.get('PORT', 5000))
     app.run(debug=True, port=port, host='0.0.0.0')
