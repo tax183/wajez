@@ -71,7 +71,7 @@ app.delete('/delete/:filename', (req, res) => {
 });
 
 // ⚡ تحسين معالجة الملفات بدون SQS
-const processLocalFiles = () => {
+const processLocalFiles = async () => {
     console.log("🔄 Checking for new files...");
 
     fs.readdir(uploadsDir, async (err, files) => {
@@ -107,17 +107,18 @@ const processLocalFiles = () => {
 // تشغيل المعالجة كل 10 ثواني (إذا لم يكن هناك عملية أخرى قيد التشغيل)
 let isProcessing = false;
 
-setInterval(() => {
+setInterval(async () => {
     if (!isProcessing) {
         isProcessing = true;
-        processLocalFiles().finally(() => {
+        try {
+            await processLocalFiles();
+        } catch (error) {
+            console.error("❌ Error in processLocalFiles():", error);
+        } finally {
             isProcessing = false;
-        });
+        }
     }
 }, 10000);
-
-// تشغيل `worker.js` داخل السيرفر (معطل مؤقتًا لتجنب تعليق التطبيق)
-// const workerProcess = spawn('node', ['worker.js'], { stdio: 'inherit' });
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
@@ -131,11 +132,9 @@ const runPythonScript = (filePath) => {
             if (error) {
                 console.error(`❌ Python script error:`, error.message);
                 reject(error.message);
-            } else if (stderr) {
-                console.warn(`⚠️ Python script warning:`, stderr);
-                resolve(stderr.trim());
             } else {
-                resolve(stdout.trim());
+                const output = stdout.trim() || stderr.trim();
+                resolve(output);
             }
         });
     });
